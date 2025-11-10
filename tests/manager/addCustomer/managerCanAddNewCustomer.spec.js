@@ -3,47 +3,49 @@ import { faker } from '@faker-js/faker';
 import { AddCustomerPage } from '../../../src/pages/manager/AddCustomerPage';
 import { CustomersListPage } from '../../../src/pages/manager/CustomersListPage';
 
-test('Assert manager can add new customer', async ({ page }) => {
-  /* 
-  Test:
-  1. Open add customer page by link
-    https://www.globalsqa.com/angularJs-protractor/BankingProject/#/manager/addCust
-  2. Fill the First Name.  
-  3. Fill the Last Name.
-  4. Fill the Postal Code.
-  5. Click [Add Customer].
-  6. Reload the page (This is a simplified step to close the popup)
-  7. Click [Customers] button.
-  8. Assert the customer First Name is present in the table in the last row. 
-  9. Assert the customer Last Name is present in the table in the last row. 
-  10. Assert the customer Postal Code is present in the table in the last row. 
-  11. Assert there is no account number for the new customer in the last row. 
+test.describe('Manager - Add New Customer', () => {
+  test('Assert manager can add new customer', async ({ page }) => {
+    /* 
+    Test:
+    1. Open add customer page by link
+      https://www.globalsqa.com/angularJs-protractor/BankingProject/#/manager/addCust
+    2. Fill the First Name.  
+    3. Fill the Last Name.
+    4. Fill the Postal Code.
+    5. Click [Add Customer].
+    6. Reload the page (This is a simplified step to close the popup)
+    7. Click [Customers] button.
+    8. Assert the customer First Name is present in the table. 
+    9. Assert the customer Last Name is present in the table. 
+    10. Assert the customer Postal Code is present in the table. 
+    11. Assert there is no account number for the new customer. 
+    */
 
-  Tips:
-  1. Use faker for test data generation, example usage:
+    const addCustomerPage = new AddCustomerPage(page);
+    const customersListPage = new CustomersListPage(page);
+    
+    // Генерируем тестовые данные
     const firstName = faker.person.firstName();
-    const lastName = faker.person.LastName();
-    const postCode = faker.location.zipCode(); 
-
-  2. Do not rely on the customer row id for the steps 8-11. 
-    Use the ".last()" locator to get the last row.
-  */
-
-  const addCustomerPage = new AddCustomerPage(page);
-  const customerPage = new CustomersListPage(page);
-  const firstName = faker.person.firstName();
-  const lastName = faker.person.lastName();
-  const postalCode = faker.location.zipCode();
-  
-  await addCustomerPage.open();
-  await addCustomerPage.fillFirstName(firstName);
-  await addCustomerPage.fillLastName(lastName);
-  await addCustomerPage.fillPostalCode(postalCode);
-  await addCustomerPage.clickOnAddCustomerButton();
-  await page.reload();
-  await customerPage.clickOnCustomerButton();
-  await customerPage.assertFirstName(firstName);
-  await customerPage.assertLastName(lastName);
-  await customerPage.assertPostalCode(postalCode);
-  await customerPage.assertNoAccountNumber();
+    const lastName = faker.person.lastName();
+    const postalCode = faker.location.zipCode();
+    
+    // Открываем страницу и добавляем клиента
+    await addCustomerPage.open();
+    await addCustomerPage.fillFirstName(firstName);
+    await addCustomerPage.fillLastName(lastName);
+    await addCustomerPage.fillPostalCode(postalCode);
+    await addCustomerPage.clickOnAddCustomerButton();
+    
+    // Закрываем popup перезагрузкой
+    await page.reload();
+    
+    // Переходим на страницу клиентов
+    await customersListPage.clickOnCustomerButton();
+    
+    // Проверяем данные КОНКРЕТНОГО клиента (не последней строки)
+    await customersListPage.assertFirstName(firstName, lastName);
+    await customersListPage.assertLastName(firstName, lastName);
+    await customersListPage.assertPostalCode(firstName, lastName, postalCode);
+    await customersListPage.assertNoAccountNumber(firstName, lastName);
+  });
 });

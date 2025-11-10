@@ -5,56 +5,56 @@ import { AddCustomerPage } from '../../../src/pages/manager/AddCustomerPage';
 import { OpenAccountPage } from '../../../src/pages/manager/OpenAccountPage';
 import { CustomersListPage } from '../../../src/pages/manager/CustomersListPage';
 
-const firstName = faker.person.firstName();
-const lastName = faker.person.lastName();
-const postalCode = faker.location.zipCode();
+test.describe('Manager - Open Account', () => {
+  let bankManagerPage;
+  let addCustomerPage;
+  let openAccountPage;
+  let customersListPage;
+  let firstName;
+  let lastName;
+  let postalCode;
 
-test.beforeEach(async ({ page }) => {
-  /* 
-  Pre-conditons:
-  1. Open Add Customer page
-  2. Fill the First Name.  
-  3. Fill the Last Name.
-  4. Fill the Postal Code.
-  5. Click [Add Customer].
-  6. Reload the page (This is a simplified step to close the popup).
-  */
-  const addCustomerPage = new AddCustomerPage(page);
+  test.beforeEach(async ({ page }) => {
+    // Генерируем данные внутри beforeEach
+    firstName = faker.person.firstName();
+    lastName = faker.person.lastName();
+    postalCode = faker.location.zipCode();
 
-  await addCustomerPage.open();
-  await addCustomerPage.fillFirstName(firstName);
-  await addCustomerPage.fillLastName(lastName);
-  await addCustomerPage.fillPostalCode(postalCode);
-  await addCustomerPage.clickOnAddCustomerButton();
-  await page.reload();
-});
+    // Инициализируем Page Objects
+    bankManagerPage = new BankManagerMainPage(page);
+    addCustomerPage = new AddCustomerPage(page);
+    openAccountPage = new OpenAccountPage(page);
+    customersListPage = new CustomersListPage(page);
 
-test('Assert manager can add new customer', async ({ page }) => {
-  /* 
-  Test:
-  1. Click [Open Account].
-  2. Select Customer name you just created.
-  3. Select currency.
-  4. Click [Process].
-  5. Reload the page (This is a simplified step to close the popup).
-  6. Click [Customers].
-  7. Assert the customer row has the account number not empty.
+    // Pre-conditions:
+    await bankManagerPage.open();
+    await bankManagerPage.choosePage('Add Customer');
+    await addCustomerPage.fillFirstName(firstName);
+    await addCustomerPage.fillLastName(lastName);
+    await addCustomerPage.fillPostalCode(postalCode);
+    await addCustomerPage.clickOnAddCustomerButton();
+  });
 
-  Tips:
-  1. Do not rely on the customer row id for the step 13. 
-    Use the ".last()" locator to get the last row.
-  */
-  const bankManagerPage = new BankManagerMainPage(page);
-  const openAccountPage = new OpenAccountPage(page);
-  const customerPage = new CustomersListPage(page);
-  const openAccount = 'Open Account';
-  const customersPage = 'Customers'
-
-  await bankManagerPage.choosePage(openAccount);
-  await openAccountPage.selectCustomer({firstName, lastName});
-  await openAccountPage.selectCurrency('Dollar');
-  await openAccountPage.clickOnProcessButton();
-  await page.reload();
-  await bankManagerPage.choosePage(customersPage);
-  await customerPage.assertAccountNumberIsVisible();
+  test('Assert manager can open account for customer', async ({ page }) => {
+    // Открыть страницу открытия счета
+    await bankManagerPage.choosePage('Open Account');
+    
+    // Выбрать клиента
+    await openAccountPage.selectCustomer({firstName, lastName});
+    
+    // Выбрать валюту
+    await openAccountPage.selectCurrency('Dollar');
+    
+    // Нажать Process
+    await openAccountPage.clickOnProcessButton();
+    
+    // Перезагрузить страницу
+    await page.reload();
+    
+    // Перейти на страницу клиентов
+    await bankManagerPage.choosePage('Customers');
+    
+    // Проверить, что номер счета видимый для конкретного клиента
+    await customersListPage.assertAccountNumberIsVisible(firstName, lastName);
+  });
 });

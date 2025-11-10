@@ -20,7 +20,7 @@ export class BankManagerMainPage {
     } else if (nameOfPage === 'Customers'){
       await this.customersButton.click();
     } else {
-      throw new Error(`assertButtonOnMainPage expecting: 'Add Customer' or 'Open Account' or 'Customers', received: ${nameOfPage}`);
+      throw new Error(`choosePage expecting: 'Add Customer' or 'Open Account' or 'Customers', received: ${nameOfPage}`);
     }
   }
 
