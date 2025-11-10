@@ -13,17 +13,15 @@ test.describe('Manager - Delete Customer', () => {
   let postalCode;
 
   test.beforeEach(async ({ page }) => {
-    // Генерируем данные внутри beforeEach
+
     firstName = faker.person.firstName();
     lastName = faker.person.lastName();
     postalCode = faker.location.zipCode();
 
-    // Инициализируем Page Objects
     bankManagerPage = new BankManagerMainPage(page);
     addCustomerPage = new AddCustomerPage(page);
     customersListPage = new CustomersListPage(page);
 
-    // Pre-conditions:
     await bankManagerPage.open();
     await bankManagerPage.choosePage('Add Customer');
     await addCustomerPage.fillFirstName(firstName);
@@ -33,16 +31,12 @@ test.describe('Manager - Delete Customer', () => {
   });
 
   test('Assert manager can delete customer', async ({ page }) => {
-    // Открыть страницу с клиентами
+
     await bankManagerPage.choosePage('Customers');
-    
-    // Удалить конкретного клиента
     await customersListPage.clickOnDeleteButton(firstName, lastName);
     
-    // Перезагрузить страницу
     await page.reload();
     
-    // Проверить, что клиент удален
     await customersListPage.assertCustomerRowIsHidden(firstName, lastName);
   });
 });
