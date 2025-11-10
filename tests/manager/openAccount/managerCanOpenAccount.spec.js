@@ -29,6 +29,8 @@ test.describe('Manager - Open Account', () => {
     await addCustomerPage.fillFirstName(firstName);
     await addCustomerPage.fillLastName(lastName);
     await addCustomerPage.fillPostalCode(postalCode);
+
+    page.on('dialog', dialog => dialog.accept());
     await addCustomerPage.clickOnAddCustomerButton();
   });
 

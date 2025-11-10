@@ -22,6 +22,8 @@ test.describe('Manager - Search Customer by Last Name', () => {
     await addCustomerPage.fillFirstName(firstName);
     await addCustomerPage.fillLastName(lastName);
     await addCustomerPage.fillPostalCode(postalCode);
+
+    page.on('dialog', dialog => dialog.accept());
     await addCustomerPage.clickOnAddCustomerButton();
   });
 

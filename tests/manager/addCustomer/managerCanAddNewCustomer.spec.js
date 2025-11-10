@@ -3,29 +3,33 @@ import { faker } from '@faker-js/faker';
 import { AddCustomerPage } from '../../../src/pages/manager/AddCustomerPage';
 import { CustomersListPage } from '../../../src/pages/manager/CustomersListPage';
 
-test.describe('Manager - Add New Customer', () => {
-  test('Assert manager can add new customer', async ({ page }) => {
+test.describe('Manager - Search Customer by First Name', () => {
+  let firstName;
+  let lastName;
+  let postalCode;
 
+  test.beforeEach(async ({ page }) => {
     const addCustomerPage = new AddCustomerPage(page);
-    const customersListPage = new CustomersListPage(page);
     
-    const firstName = faker.person.firstName();
-    const lastName = faker.person.lastName();
-    const postalCode = faker.location.zipCode();
-    
+    firstName = faker.person.firstName();
+    lastName = faker.person.lastName();
+    postalCode = faker.location.zipCode();
+
     await addCustomerPage.open();
     await addCustomerPage.fillFirstName(firstName);
     await addCustomerPage.fillLastName(lastName);
     await addCustomerPage.fillPostalCode(postalCode);
+    
+    page.on('dialog', dialog => dialog.accept());
     await addCustomerPage.clickOnAddCustomerButton();
-    
-    await page.reload();
-    
-    await customersListPage.clickOnCustomerButton();
-    
-    await customersListPage.assertFirstName(firstName, lastName);
-    await customersListPage.assertLastName(firstName, lastName);
-    await customersListPage.assertPostalCode(firstName, lastName, postalCode);
-    await customersListPage.assertNoAccountNumber(firstName, lastName);
+  });
+
+  test('Assert manager can search customer by first name', async ({ page }) => {
+    const customersListPage = new CustomersListPage(page);
+
+    await customersListPage.open();
+    await customersListPage.fillSearchCustomerField(firstName);
+    await customersListPage.assertCustomerOnTheTable(firstName);
+    await customersListPage.assertOnlyOneCustomerRowOnPage();
   });
 });

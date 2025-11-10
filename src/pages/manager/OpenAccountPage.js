@@ -27,7 +27,6 @@ export class OpenAccountPage {
   }
 
   async assertSelectedCurrency(currency) {
-    await this.currencyLocator.selectOption(currency);
-    expect(await this.currencyLocator.inputValue()).toBe(currency);
+    await expect(this.currencyLocator).toHaveValue(currency);
   }
 }
